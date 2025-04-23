@@ -1,0 +1,39 @@
+﻿@model University_web_app.Models.Student
+
+<h3>Update Student</h3>
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<form method="post" action="/student/Update">
+    <!-- Hidden field for the Student ID -->
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" class="form-control" id="firstName" name="FirstName" value="@Model.FirstName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control" id="lastName" name="LastName" value="@Model.LastName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="Email" value="@Model.Email" required />
+    </div>
+
+    <div class="form-group">
+        <label for="CinId">CinId</label>
+        <input type="CinId" class="form-control" id="CinId" name="CinId" value="@Model.CinId" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3" >Update</button>
+        <div class=" col-sm-4 d_grid">
+        <a class="btn btn-outline-primary" asp-controller="student" asp-action="index" role="button">
+            Cancel
+            </a>
+        </div>
+</form>

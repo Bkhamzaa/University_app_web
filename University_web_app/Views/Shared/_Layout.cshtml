@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - University_web_app</title>
+
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/University_web_app.styles.css" asp-append-version="true" />
+
+    <!-- Paper Dashboard Styles -->
+    <link href="/css/paper-dashboard.css?v=2.0.1" rel="stylesheet" />
+    <link href="/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/now-ui-icons@1.0.0/css/now-ui-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar" data-color="white" data-active-color="danger">
+            <div class="logo">
+                <a href="https://www.creative-tim.com" class="simple-text logo-mini">
+                    <div class="logo-image-small">
+                        <img src="~/lib/logo-small.png" />
+                    </div>
+                </a>
+                <a href="https://www.creative-tim.com" class="simple-text logo-normal">
+                    ESEN  
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <ul class="nav">
+                    <li class="active">
+                        <a href="/Dashboard/index">
+                            <i class="fa fa-pie-chart" aria-hidden="true"></i>
+
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                 
+                    <li>
+                        <a href="/Student/index">
+                            <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                            <p>Students Management</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Exam/index">
+                            <i class="fa fa-envelope-open" aria-hidden="true"></i>
+                            <p>Exam Management</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/subject/index">
+                            <i class="fa fa-book" aria-hidden="true"></i>
+                            </i><p>Subjects Management</p>
+                        </a>
+                    </li>
+                  
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <div class="navbar-toggle">
+                            <button type="button" class="navbar-toggler">
+                                <span class="navbar-toggler-bar bar1"></span>
+                                <span class="navbar-toggler-bar bar2"></span>
+                                <span class="navbar-toggler-bar bar3"></span>
+                            </button>
+                        </div>
+                        <a class="navbar-brand" href="javascript:;">
+                            @ViewData["Title"]
+                        </a>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation"
+                            aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                        <span class="navbar-toggler-bar navbar-kebab"></span>
+                    </button>
+                
+            </nav>
+            <!-- End Navbar -->
+
+            <div class="content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+
+           
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="/js/paper-dashboard.min.js?v=2.0.1"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Optional: sidebar toggle script -->
+    <script>
+        $('.navbar-toggler').click(function () {
+            $('body').toggleClass('nav-open');
+        });
+    </script>
+</body>
+</html>
