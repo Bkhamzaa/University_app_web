@@ -1,32 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using University_web_app.Data;
+using University_web_app.Repositories;
 
 namespace University_web_app.Controllers
 {
     public class DashboardController : Controller
     {
-        private readonly UniversityContext _context;
+        private readonly DashboardRepository _dashboardRepository;
 
-        public DashboardController(UniversityContext context)
+        public DashboardController(DashboardRepository dashboardRepository)
         {
-            _context = context;
+            _dashboardRepository = dashboardRepository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var studentCount = await _context.Students.CountAsync();
-            var examCount = await _context.Exams.CountAsync();
-            var subjectCount = await _context.Subjects.CountAsync();
-
-            var studentsPerLevel = await _context.Levels
-                .Include(l => l.Students)
-                .ToDictionaryAsync(l => l.Name, l => l.Students.Count);
-
-            ViewBag.StudentCount = studentCount;
-            ViewBag.ExamCount = examCount;
-            ViewBag.SubjectCount = subjectCount;
-            ViewBag.StudentsPerLevel = studentsPerLevel;
+            ViewBag.StudentCount = await _dashboardRepository.GetStudentCountAsync();
+            ViewBag.ExamCount = await _dashboardRepository.GetExamCountAsync();
+            ViewBag.SubjectCount = await _dashboardRepository.GetSubjectCountAsync();
+            ViewBag.StudentsPerLevel = await _dashboardRepository.GetStudentsPerLevelAsync();
 
             return View();
         }

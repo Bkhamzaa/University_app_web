@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using University_web_app.Models;
 
 namespace University_web_app.Data
 {
-    public class UniversityContext : DbContext
+    public class UniversityContext : IdentityDbContext<Users>
     {
         public UniversityContext( DbContextOptions<UniversityContext> option ) :base(option) {
         
@@ -22,6 +23,10 @@ namespace University_web_app.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+
+
             modelBuilder.Entity<Level>()
                 .HasOne(l => l.Program)
                 .WithMany(p => p.Levels)

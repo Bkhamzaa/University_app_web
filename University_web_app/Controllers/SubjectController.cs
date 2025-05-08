@@ -3,130 +3,103 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using University_web_app.Data;
 using University_web_app.Models;
+using University_web_app.Repositories;
 
 namespace University_web_app.Controllers
 {
     public class SubjectController : Controller
     {
 
+        private readonly SubjectRepository _repository;
 
-        private readonly UniversityContext _context;
-
-        public SubjectController(UniversityContext context)
+        public SubjectController(SubjectRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
+
         public async Task<IActionResult> Index()
         {
-            var programs = await _context.ProgramUnivs.ToListAsync();
-            ViewData["Programs"] = programs;  // Passing data to the view
+            var programs = await _repository.GetProgramsAsync();
+            ViewData["Programs"] = programs;
             return View();
         }
 
-
-
         public async Task<JsonResult> GetLevelsByProgram(Guid programId)
         {
-            var levels = await _context.Levels
-                                       .Where(l => l.ProgramId == programId)
-                                       .ToListAsync();
+            var levels = await _repository.GetLevelsByProgramAsync(programId);
             return Json(levels);
         }
 
-
         public async Task<JsonResult> GetSubjectsByLevel(Guid levelId)
         {
-            var subjects = await _context.Subjects
-                                          .Where(s => s.LevelId == levelId)
-                                          .ToListAsync();
+            var subjects = await _repository.GetSubjectsByLevelAsync(levelId);
             return Json(subjects);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> AddSubject(Subject subject)
         {
-            subject.Level = await _context.Levels.FindAsync(subject.LevelId);
-
             if (!string.IsNullOrEmpty(subject.Name) &&
-               !double.IsNaN(subject.Coefficient)   &&
-               !string.IsNullOrEmpty(subject.Semester))
+                !double.IsNaN(subject.Coefficient) &&
+                !string.IsNullOrEmpty(subject.Semester))
             {
-               
-                _context.Subjects.Add(subject);
-                await _context.SaveChangesAsync();
+                await _repository.AddSubjectAsync(subject);
                 return Ok("Subject added successfully.");
             }
 
             return BadRequest("All fields are required.");
-
-
         }
 
-       // [HttpDelete]
-        //[Route("Subject/DeleteSubject/{id}")]
         public async Task<IActionResult> DeleteSubject(Guid id)
         {
-            var Subject = await _context.Subjects.FindAsync(id);
-            if (Subject == null)
-            {
+            var subject = await _repository.GetSubjectByIdAsync(id);
+            if (subject == null)
                 return NotFound(new { message = "Subject not found." });
-            }
 
-            _context.Subjects.Remove(Subject);
-            await _context.SaveChangesAsync();
+            await _repository.DeleteSubjectAsync(subject);
             return Ok(new { message = "Subject deleted successfully." });
         }
 
-
-        [HttpGet]
-        [Route("Subject/UpdateSubject/{id}")]
-        public IActionResult UpdateSubject(Guid id)
+        [HttpGet("Subject/UpdateSubject/{id}")]
+        public async Task<IActionResult> UpdateSubject(Guid id)
         {
-            var subject = _context.Subjects.FirstOrDefault(s => s.Id == id);
+            var subject = await _repository.GetSubjectByIdAsync(id);
+            if (subject == null)
+                return NotFound();
 
             return View(subject);
-
         }
 
-
-          [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Update(Subject subject)
         {
-            if (string.IsNullOrEmpty(subject.Name) &&
-                 double.IsNaN(subject.Coefficient) &&
-                 string.IsNullOrEmpty(subject.Semester))
+            if (string.IsNullOrEmpty(subject.Name) ||
+                double.IsNaN(subject.Coefficient) ||
+                string.IsNullOrEmpty(subject.Semester))
             {
                 ViewBag.ErrorMessage = "All fields are required.";
                 return View("UpdateSubject", subject);
             }
 
-            var existingSubject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subject.Id);
-            if (existingSubject == null)
-            {
+            var existing = await _repository.GetSubjectByIdAsync(subject.Id);
+            if (existing == null)
                 return NotFound();
-            }
 
-            existingSubject.Name = subject.Name;
-            existingSubject.Coefficient = subject.Coefficient;
-            existingSubject.Semester = subject.Semester;
-        
+            existing.Name = subject.Name;
+            existing.Coefficient = subject.Coefficient;
+            existing.Semester = subject.Semester;
 
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("index");
+            await _repository.UpdateSubjectAsync(existing);
+            return RedirectToAction("Index");
         }
-        [HttpGet]
+
         [HttpGet]
         public async Task<IActionResult> SearchSubjects(string term, Guid levelId)
         {
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
-            var results = await _context.Subjects
-                .Where(s => s.LevelId == levelId && s.Name.Contains(term))
-                .ToListAsync();
-
+            var results = await _repository.SearchSubjectsAsync(term, levelId);
             return Json(results);
         }
 

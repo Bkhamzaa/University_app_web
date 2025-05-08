@@ -3,87 +3,71 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using University_web_app.Data;
 using University_web_app.Models;
+using University_web_app.Repositories;
 
 namespace University_web_app.Controllers
 {
     public class StudentController : Controller
     {
-        private readonly UniversityContext _context;
+        private readonly StudentRepository _repository;
 
-        public StudentController(UniversityContext context)
+        public StudentController(StudentRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
-     
-        public async Task<IActionResult> index()
+
+        public async Task<IActionResult> Index()
         {
-            var programs = await _context.ProgramUnivs.ToListAsync();
-            ViewData["Programs"] = programs;  // Passing data to the view
+            var programs = await _repository.GetProgramsAsync();
+            ViewData["Programs"] = programs;
             return View();
         }
 
-        // Get levels based on the selected program
         public async Task<JsonResult> GetLevelsByProgram(Guid programId)
         {
-            var levels = await _context.Levels
-                                       .Where(l => l.ProgramId == programId)
-                                       .ToListAsync();
+            var levels = await _repository.GetLevelsByProgramAsync(programId);
             return Json(levels);
         }
 
-        // Get students based on the selected level
         public async Task<JsonResult> GetStudentsByLevel(Guid levelId)
         {
-            var students = await _context.Students
-                                          .Where(s => s.LevelId == levelId)
-                                          .ToListAsync();
+            var students = await _repository.GetStudentsByLevelAsync(levelId);
             return Json(students);
         }
 
-
-
-       
         [HttpPost]
-        public IActionResult AddStudent(Student student)
+        public async Task<IActionResult> AddStudent(Student student)
         {
-            if (!string.IsNullOrEmpty(student.CinId) &&
-                !string.IsNullOrEmpty(student.FirstName) &&
-                !string.IsNullOrEmpty(student.LastName) &&
-                !string.IsNullOrEmpty(student.Email))
+            if (string.IsNullOrEmpty(student.CinId) ||
+                string.IsNullOrEmpty(student.FirstName) ||
+                string.IsNullOrEmpty(student.LastName) ||
+                string.IsNullOrEmpty(student.Email))
             {
-                _context.Students.Add(student);
-                _context.SaveChanges();
-                return Ok("Student added successfully.");
+                return BadRequest("All fields are required.");
             }
 
-            // Return 400 Bad Request with a message
-            return BadRequest("All fields are required.");
+            await _repository.AddStudentAsync(student);
+            return Ok("Student added successfully.");
         }
-
-
 
         public async Task<IActionResult> DeleteStudent(Guid id)
         {
-            var student = await _context.Students.FindAsync(id);
+            var student = await _repository.GetStudentByIdAsync(id);
             if (student == null)
-            {
                 return NotFound(new { message = "Student not found." });
-            }
 
-            _context.Students.Remove(student);
-            await _context.SaveChangesAsync();
+            await _repository.DeleteStudentAsync(id);
             return Ok(new { message = "Student deleted successfully." });
         }
 
-
-        [HttpGet]
-        [Route("student/UpdateStudent/{id}")]
-        public IActionResult UpdateStudent ( Guid id)
+        [HttpGet("student/UpdateStudent/{id}")]
+        public async Task<IActionResult> UpdateStudent(Guid id)
         {
-            var student = _context.Students.FirstOrDefault(s => s.Id == id);
+            var student = await _repository.GetStudentByIdAsync(id);
+            if (student == null)
+                return NotFound();
 
             return View(student);
-
         }
 
         [HttpPost]
@@ -98,22 +82,18 @@ namespace University_web_app.Controllers
                 return View("UpdateStudent", student);
             }
 
-            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Id == student.Id);
-            if (existingStudent == null)
-            {
+            var existing = await _repository.GetStudentByIdAsync(student.Id);
+            if (existing == null)
                 return NotFound();
-            }
 
-            existingStudent.FirstName = student.FirstName;
-            existingStudent.LastName = student.LastName;
-            existingStudent.Email = student.Email;
-            existingStudent.CinId = student.CinId;
+            existing.FirstName = student.FirstName;
+            existing.LastName = student.LastName;
+            existing.Email = student.Email;
+            existing.CinId = student.CinId;
 
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("index");
+            await _repository.UpdateStudentAsync(existing);
+            return RedirectToAction("Index");
         }
-
 
 
     }

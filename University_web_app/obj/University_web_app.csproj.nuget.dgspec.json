@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Hamza\\Desktop\\University_web_app\\University_web_app\\University_web_app.csproj": {}
+    "C:\\Users\\Hamza\\Documents\\GitHub\\University_app_web\\University_web_app\\University_web_app.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Hamza\\Desktop\\University_web_app\\University_web_app\\University_web_app.csproj": {
+    "C:\\Users\\Hamza\\Documents\\GitHub\\University_app_web\\University_web_app\\University_web_app.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Hamza\\Desktop\\University_web_app\\University_web_app\\University_web_app.csproj",
+        "projectUniqueName": "C:\\Users\\Hamza\\Documents\\GitHub\\University_app_web\\University_web_app\\University_web_app.csproj",
         "projectName": "University_web_app",
-        "projectPath": "C:\\Users\\Hamza\\Desktop\\University_web_app\\University_web_app\\University_web_app.csproj",
+        "projectPath": "C:\\Users\\Hamza\\Documents\\GitHub\\University_app_web\\University_web_app\\University_web_app.csproj",
         "packagesPath": "C:\\Users\\Hamza\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Hamza\\Desktop\\University_web_app\\University_web_app\\obj\\",
+        "outputPath": "C:\\Users\\Hamza\\Documents\\GitHub\\University_app_web\\University_web_app\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[7.0.20, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[9.0.4, )"
