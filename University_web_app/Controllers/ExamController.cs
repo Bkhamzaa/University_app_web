@@ -72,5 +72,71 @@ University Exam Office
 
 
 
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> ImportCsv(IFormFile csvFile)
+        {
+            if (csvFile == null || csvFile.Length == 0)
+            {
+                TempData["Error"] = "Please select a valid CSV file.";
+                return RedirectToAction("Index");
+            }
+
+            using var reader = new StreamReader(csvFile.OpenReadStream());
+            var exams = new List<Exam>();
+
+            await reader.ReadLineAsync(); // Skip header
+
+            while (!reader.EndOfStream)
+            {
+                var line = await reader.ReadLineAsync();
+                var values = line.Split(',');
+
+                if (values.Length < 4)
+                    continue;
+
+                string cinId = values[0].Trim();
+                string subjectIdStr = values[1].Trim();
+                string dsStr = values[2].Trim();
+                string finalStr = values[3].Trim();
+
+                if (!Guid.TryParse(subjectIdStr, out Guid subjectId))
+                    continue;
+
+                var student = await _examRepository.GetStudentByCinAsync(cinId);
+                var subject = await _examRepository.GetSubjectByIdAsync(subjectId);
+
+                if (student == null || subject == null)
+                    continue;
+
+                var exam = new Exam
+                {
+                    Id = Guid.NewGuid(),
+                    CinId = cinId,
+                    SubjectId = subjectId,
+                    DS = double.TryParse(dsStr, out var dsVal) ? dsVal : null,
+                    FinalExam = double.TryParse(finalStr, out var finalVal) ? finalVal : null,
+                    Student = student,
+                    Subject = subject
+                };
+
+                exams.Add(exam);
+            }
+
+            if (exams.Any())
+            {
+                await _examRepository.AddExamsAsync(exams);
+                TempData["Success"] = $"{exams.Count} exams imported successfully.";
+            }
+            else
+            {
+                TempData["Warning"] = "No valid data found in the CSV.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
